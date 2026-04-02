@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="DemoProjectUsingEnityFramework-PostgresSQL/DemoProjectUsingEnityFramework-PostgresSQL.csproj" />
+  <Project Path="Infrastructure/Infrastructure.csproj" />
+</Solution>
