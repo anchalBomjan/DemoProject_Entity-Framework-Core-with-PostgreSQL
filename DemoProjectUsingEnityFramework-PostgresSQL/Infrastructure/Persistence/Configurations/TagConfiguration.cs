@@ -1,0 +1,22 @@
+﻿
+
+using DomainLayer.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Infrastracture.Persistence.Configurations
+{
+
+    public class TagConfiguration : IEntityTypeConfiguration<Tag>
+    {
+        public void Configure(EntityTypeBuilder<Tag> builder)
+        {
+            builder.ToTable("Tags");
+            builder.HasKey(t => t.Id);
+
+            builder.Property(t => t.Name)
+                   .IsRequired()
+                   .HasMaxLength(50);
+        }
+    }
+}
