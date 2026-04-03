@@ -1,4 +1,6 @@
 <Solution>
+  <Project Path="Application/Application.csproj" />
   <Project Path="DemoProjectUsingEnityFramework-PostgresSQL/DemoProjectUsingEnityFramework-PostgresSQL.csproj" />
+  <Project Path="DomainLayer/DomainLayer.csproj" />
   <Project Path="Infrastructure/Infrastructure.csproj" />
 </Solution>
