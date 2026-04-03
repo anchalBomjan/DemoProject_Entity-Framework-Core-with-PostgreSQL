@@ -1,11 +1,10 @@
-﻿using DomainLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
-namespace DomainLayer.Persistence.Configurations
+using DomainLayer.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Infrastracture.Persistence.Configurations
 {
     public class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
@@ -30,7 +29,7 @@ namespace DomainLayer.Persistence.Configurations
             // Many-to-many: Product ↔ Tag
             builder.HasMany(p => p.Tags)
                    .WithMany(t => t.Products)
-                   .UsingEntity(j => j.ToTable("ProductTags")); // junction table
+                   .UsingEntity(j => j.ToTable("ProductTags"));
         }
     }
 }
