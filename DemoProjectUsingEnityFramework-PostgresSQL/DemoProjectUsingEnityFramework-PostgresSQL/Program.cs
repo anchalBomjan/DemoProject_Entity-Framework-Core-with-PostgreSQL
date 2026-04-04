@@ -1,4 +1,9 @@
 
+using Application.Common.Interfaces;
+using Infrastructure.Persistence;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+
 namespace DemoProjectUsingEnityFramework_PostgresSQL
 {
     public class Program
@@ -13,6 +18,16 @@ namespace DemoProjectUsingEnityFramework_PostgresSQL
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            // Add DbContext
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            // Register IAppDbContext
+            builder.Services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
+
+            // Add MediatR
+            builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Application.Common.Interfaces.IAppDbContext).Assembly));
 
             var app = builder.Build();
 
