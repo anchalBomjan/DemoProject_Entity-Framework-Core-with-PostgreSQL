@@ -1,6 +1,10 @@
-using Application.Tags.Commands;
-using Application.Tags.Queries;
-using DomainLayer.Entities;
+using Application.Common.ModelViews;
+using Application.Common.Responses;
+using Application.Tags.Create;
+using Application.Tags.Delete;
+using Application.Tags.GetAll;
+using Application.Tags.GetById;
+using Application.Tags.Update;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,46 +22,42 @@ public class TagsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Tag>>> GetTags()
+    public async Task<ActionResult<Response<IEnumerable<TagViewModel>>>> GetTags()
     {
-        var tags = await _mediator.Send(new GetTagsQuery());
-        return Ok(tags);
+        var response = await _mediator.Send(new GetTagsQuery());
+        return Ok(response);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Tag>> GetTag(int id)
+    public async Task<ActionResult<Response<TagViewModel?>>> GetTag(int id)
     {
-        var tag = await _mediator.Send(new GetTagQuery { Id = id });
-        if (tag == null)
-        {
-            return NotFound();
-        }
-        return Ok(tag);
+        var response = await _mediator.Send(new GetTagQuery { Id = id });
+        return Ok(response);
     }
 
     [HttpPost]
-    public async Task<ActionResult<int>> CreateTag(CreateTagCommand command)
+    public async Task<ActionResult<Response<int>>> CreateTag(CreateTagCommand command)
     {
-        var tagId = await _mediator.Send(command);
-        return CreatedAtAction(nameof(GetTag), new { id = tagId }, tagId);
+        var response = await _mediator.Send(command);
+        return CreatedAtAction(nameof(GetTag), new { id = response.Data }, response);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateTag(int id, UpdateTagCommand command)
+    public async Task<ActionResult<Response<bool>>> UpdateTag(int id, UpdateTagCommand command)
     {
         if (id != command.Id)
         {
-            return BadRequest();
+            return BadRequest(Response<bool>.Failure("URL ID does not match command ID"));
         }
 
-        await _mediator.Send(command);
-        return NoContent();
+        var response = await _mediator.Send(command);
+        return Ok(response);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteTag(int id)
+    public async Task<ActionResult<Response<bool>>> DeleteTag(int id)
     {
-        await _mediator.Send(new DeleteTagCommand { Id = id });
-        return NoContent();
+        var response = await _mediator.Send(new DeleteTagCommand { Id = id });
+        return Ok(response);
     }
 }

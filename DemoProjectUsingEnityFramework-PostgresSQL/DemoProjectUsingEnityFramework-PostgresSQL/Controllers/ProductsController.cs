@@ -1,6 +1,10 @@
-using Application.Products.Commands;
-using Application.Products.Queries;
-using DomainLayer.Entities;
+using Application.Common.ModelViews;
+using Application.Common.Responses;
+using Application.Products.Create;
+using Application.Products.Delete;
+using Application.Products.GetAll;
+using Application.Products.GetById;
+using Application.Products.Update;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,46 +22,42 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+    public async Task<ActionResult<Response<IEnumerable<ProductViewModel>>>> GetProducts()
     {
-        var products = await _mediator.Send(new GetProductsQuery());
-        return Ok(products);
+        var response = await _mediator.Send(new GetProductsQuery());
+        return Ok(response);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Product>> GetProduct(int id)
+    public async Task<ActionResult<Response<ProductViewModel?>>> GetProduct(int id)
     {
-        var product = await _mediator.Send(new GetProductQuery { Id = id });
-        if (product == null)
-        {
-            return NotFound();
-        }
-        return Ok(product);
+        var response = await _mediator.Send(new GetProductQuery { Id = id });
+        return Ok(response);
     }
 
     [HttpPost]
-    public async Task<ActionResult<int>> CreateProduct(CreateProductCommand command)
+    public async Task<ActionResult<Response<int>>> CreateProduct(CreateProductCommand command)
     {
-        var productId = await _mediator.Send(command);
-        return CreatedAtAction(nameof(GetProduct), new { id = productId }, productId);
+        var response = await _mediator.Send(command);
+        return CreatedAtAction(nameof(GetProduct), new { id = response.Data }, response);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateProduct(int id, UpdateProductCommand command)
+    public async Task<ActionResult<Response<bool>>> UpdateProduct(int id, UpdateProductCommand command)
     {
         if (id != command.Id)
         {
-            return BadRequest();
+            return BadRequest(Response<bool>.Failure("URL ID does not match command ID"));
         }
 
-        await _mediator.Send(command);
-        return NoContent();
+        var response = await _mediator.Send(command);
+        return Ok(response);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteProduct(int id)
+    public async Task<ActionResult<Response<bool>>> DeleteProduct(int id)
     {
-        await _mediator.Send(new DeleteProductCommand { Id = id });
-        return NoContent();
+        var response = await _mediator.Send(new DeleteProductCommand { Id = id });
+        return Ok(response);
     }
 }

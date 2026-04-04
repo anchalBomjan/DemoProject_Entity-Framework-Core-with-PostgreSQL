@@ -1,8 +1,11 @@
 
+using Application.Common.Behaviors;
 using Application.Common.Interfaces;
+using FluentValidation;
 using Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using DemoProjectUsingEnityFramework_PostgresSQL.Middleware;
 
 namespace DemoProjectUsingEnityFramework_PostgresSQL
 {
@@ -13,8 +16,8 @@ namespace DemoProjectUsingEnityFramework_PostgresSQL
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -29,6 +32,12 @@ namespace DemoProjectUsingEnityFramework_PostgresSQL
             // Add MediatR
             builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Application.Common.Interfaces.IAppDbContext).Assembly));
 
+            // Add FluentValidation validators
+            builder.Services.AddValidatorsFromAssembly(typeof(Application.Common.Interfaces.IAppDbContext).Assembly);
+
+            // Add MediatR validation pipeline behavior
+            builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -40,8 +49,10 @@ namespace DemoProjectUsingEnityFramework_PostgresSQL
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+            // Add custom exception middleware (before authorization so it catches all errors)
+            app.UseMiddleware<ExceptionMiddleware>();
 
+            app.UseAuthorization();
 
             app.MapControllers();
 

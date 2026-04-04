@@ -1,6 +1,10 @@
-using Application.Categories.Commands;
-using Application.Categories.Queries;
-using DomainLayer.Entities;
+using Application.Categories.Create;
+using Application.Categories.Delete;
+using Application.Categories.GetAll;
+using Application.Categories.GetById;
+using Application.Categories.Update;
+using Application.Common.ModelViews;
+using Application.Common.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,46 +22,42 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
+    public async Task<ActionResult<Response<IEnumerable<CategoryViewModel>>>> GetCategories()
     {
-        var categories = await _mediator.Send(new GetCategoriesQuery());
-        return Ok(categories);
+        var response = await _mediator.Send(new GetCategoriesQuery());
+        return Ok(response);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Category>> GetCategory(int id)
+    public async Task<ActionResult<Response<CategoryViewModel?>>> GetCategory(int id)
     {
-        var category = await _mediator.Send(new GetCategoryQuery { Id = id });
-        if (category == null)
-        {
-            return NotFound();
-        }
-        return Ok(category);
+        var response = await _mediator.Send(new GetCategoryQuery { Id = id });
+        return Ok(response);
     }
 
     [HttpPost]
-    public async Task<ActionResult<int>> CreateCategory(CreateCategoryCommand command)
+    public async Task<ActionResult<Response<int>>> CreateCategory(CreateCategoryCommand command)
     {
-        var categoryId = await _mediator.Send(command);
-        return CreatedAtAction(nameof(GetCategory), new { id = categoryId }, categoryId);
+        var response = await _mediator.Send(command);
+        return CreatedAtAction(nameof(GetCategory), new { id = response.Data }, response);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateCategory(int id, UpdateCategoryCommand command)
+    public async Task<ActionResult<Response<bool>>> UpdateCategory(int id, UpdateCategoryCommand command)
     {
         if (id != command.Id)
         {
-            return BadRequest();
+            return BadRequest(Response<bool>.Failure("URL ID does not match command ID"));
         }
 
-        await _mediator.Send(command);
-        return NoContent();
+        var response = await _mediator.Send(command);
+        return Ok(response);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteCategory(int id)
+    public async Task<ActionResult<Response<bool>>> DeleteCategory(int id)
     {
-        await _mediator.Send(new DeleteCategoryCommand { Id = id });
-        return NoContent();
+        var response = await _mediator.Send(new DeleteCategoryCommand { Id = id });
+        return Ok(response);
     }
 }
