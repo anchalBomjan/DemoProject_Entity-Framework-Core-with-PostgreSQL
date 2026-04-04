@@ -1,10 +1,10 @@
 using Application.Common.ModelViews;
 using Application.Common.Responses;
-using Application.Products.Create;
-using Application.Products.Delete;
-using Application.Products.GetAll;
-using Application.Products.GetById;
-using Application.Products.Update;
+using Application.Products.Commands.Create;
+using Application.Products.Commands.Delete;
+using Application.Products.Commands.Update;
+using Application.Products.Queries.GetAll;
+using Application.Products.Queries.GetById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,7 +47,7 @@ public class ProductsController : ControllerBase
     {
         if (id != command.Id)
         {
-            return BadRequest(Response<bool>.Failure("URL ID does not match command ID"));
+            return BadRequest(Application.Common.Responses.Response<bool>.Failure("URL ID does not match command ID"));
         }
 
         var response = await _mediator.Send(command);

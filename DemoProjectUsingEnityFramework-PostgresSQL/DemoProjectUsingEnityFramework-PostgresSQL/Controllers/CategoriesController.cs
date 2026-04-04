@@ -1,8 +1,8 @@
-using Application.Categories.Create;
-using Application.Categories.Delete;
-using Application.Categories.GetAll;
-using Application.Categories.GetById;
-using Application.Categories.Update;
+using Application.Categories.Commands.Create;
+using Application.Categories.Commands.Delete;
+using Application.Categories.Commands.Update;
+using Application.Categories.Queries.GetAll;
+using Application.Categories.Queries.GetById;
 using Application.Common.ModelViews;
 using Application.Common.Responses;
 using MediatR;
@@ -47,7 +47,7 @@ public class CategoriesController : ControllerBase
     {
         if (id != command.Id)
         {
-            return BadRequest(Response<bool>.Failure("URL ID does not match command ID"));
+            return BadRequest(Application.Common.Responses.Response<bool>.Failure("URL ID does not match command ID"));
         }
 
         var response = await _mediator.Send(command);

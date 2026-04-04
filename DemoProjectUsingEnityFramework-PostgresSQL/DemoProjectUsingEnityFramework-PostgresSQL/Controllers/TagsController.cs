@@ -1,10 +1,10 @@
+using Application.Tags.Commands.Create;
+using Application.Tags.Commands.Delete;
+using Application.Tags.Commands.Update;
+using Application.Tags.Queries.GetAll;
+using Application.Tags.Queries.GetById;
 using Application.Common.ModelViews;
 using Application.Common.Responses;
-using Application.Tags.Create;
-using Application.Tags.Delete;
-using Application.Tags.GetAll;
-using Application.Tags.GetById;
-using Application.Tags.Update;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,7 +47,7 @@ public class TagsController : ControllerBase
     {
         if (id != command.Id)
         {
-            return BadRequest(Response<bool>.Failure("URL ID does not match command ID"));
+            return BadRequest(Application.Common.Responses.Response<bool>.Failure("URL ID does not match command ID"));
         }
 
         var response = await _mediator.Send(command);
